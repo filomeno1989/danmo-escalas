@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Danmo Escalas — Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="supabase.js"></script>
+  <script src="tema.js"></script>
+  <script src="auth.js"></script>
+  <script src="utils.js"></script>
+  <style>
+    /* ── Grade mensal mini ─────────────────────────────────── */
+    .hoje-banner {
+      background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .hoje-banner .data-hoje {
+      font-size: 13px;
+      color: rgba(255,255,255,0.7);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .hoje-banner .mes-ano {
+      font-size: 22px;
+      font-weight: 700;
+      color: #fff;
+      margin-top: 2px;
+    }
+    .hoje-banner .btn-gerar {
+      background: var(--color-accent);
+      color: #1a1a1a;
+      border: none;
+      padding: 10px 20px;
+      border-radius: var(--radius);
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: filter .2s;
+    }
+    .hoje-banner .btn-gerar:hover { filter: brightness(1.1); }
+
+    /* ── Grupos hoje ──────────────────────────────────────── */
+    .grupos-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+    .grupo-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius);
+      padding: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+    .grupo-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+    }
+    .grupo-card.manha::before  { background: #90cdf4; }
+    .grupo-card.noite::before  { background: #d6bcfa; }
+    .grupo-card.folga::before  { background: #9ae6b4; }
+
+    .grupo-card .grupo-nome {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--color-text-muted);
+      margin-bottom: 8px;
+    }
+    .grupo-card .turno-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+    .turno-badge.manha  { background: #1a3a5c; color: #90cdf4; }
+    .turno-badge.noite  { background: #2d1b4e; color: #d6bcfa; }
+    .turno-badge.folga  { background: #1a2e1a; color: #9ae6b4; }
+
+    .grupo-card .membros {
+      font-size: 12px;
+      color: var(--color-text-muted);
+      line-height: 1.8;
+    }
+    .grupo-card .membro-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .grupo-card .membro-item .dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--color-text-muted);
+      flex-shrink: 0;
+    }
+
+    /* ── Semana actual ────────────────────────────────────── */
+    .semana-table th { font-size: 11px; }
+    .semana-table td { font-size: 12px; text-align: center; }
+    .semana-table .col-nome { text-align: left; font-weight: 500; min-width: 150px; }
+    .semana-table .dia-hoje { background: rgba(33,150,243,0.1); }
+
+    /* ── Secção título ────────────────────────────────────── */
+    .secao-titulo {
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--color-text-muted);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .secao-titulo::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--color-border);
+    }
+
+    /* ── Aviso sem escala ─────────────────────────────────── */
+    .aviso-sem-escala {
+      background: rgba(255,193,7,0.08);
+      border: 1px solid rgba(255,193,7,0.2);
+      border-radius: var(--radius);
+      padding: 20px;
+      text-align: center;
+      color: var(--color-text-muted);
+      font-size: 14px;
+    }
+    .aviso-sem-escala .icon { font-size: 28px; margin-bottom: 8px; }
+  </style>
+</head>
+<body>
+<div class="app-layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="app-name">DANMO SS</div>
+      <div class="app-sub">Gestão de Escalas</div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">Menu</div>
+      <a class="nav-item active" href="dashboard.html">
+        <span class="icon">🏠</span> Dashboard
+      </a>
+      <a class="nav-item" href="mensal.html">
+        <span class="icon">📅</span> Escala Mensal
+      </a>
+      <a class="nav-item" href="semanal.html">
+        <span class="icon">📋</span> Escala Semanal
+      </a>
+      <div class="nav-section">Gestão</div>
+      <a class="nav-item" href="colaboradores.html">
+        <span class="icon">👥</span> Colaboradores
+      </a>
+      <a class="nav-item" href="configuracoes.html">
+        <span class="icon">⚙️</span> Configurações
+      </a>
+      <div class="nav-section">Sistema</div>
+      <a class="nav-item" href="https://filomeno1989.github.io/danmo-billing" target="_blank">
+        <span class="icon">💰</span> Financeiro
+      </a>
+      <a class="nav-item" href="https://filomeno1989.github.io/danmo-stock" target="_blank">
+        <span class="icon">📦</span> Stock DSS
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar" id="user-avatar">F</div>
+        <div>
+          <div class="user-name"  id="user-nome">—</div>
+          <div class="user-nivel" id="user-nivel">—</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap;">
+        <div class="tema-selector">
+          <div class="tema-dot" data-tema="azul"     onclick="mudarTema('azul')"></div>
+          <div class="tema-dot" data-tema="verde"    onclick="mudarTema('verde')"></div>
+          <div class="tema-dot" data-tema="roxo"     onclick="mudarTema('roxo')"></div>
+          <div class="tema-dot" data-tema="vermelho" onclick="mudarTema('vermelho')"></div>
+          <div class="tema-dot" data-tema="cinza"    onclick="mudarTema('cinza')"></div>
+        </div>
+        <button class="toggle-escuro" onclick="toggleEscuro()">🌙</button>
+      </div>
+      <button class="btn-logout" onclick="logout()">⬅ Sair</button>
+    </div>
+  </aside>
+
+  <!-- CONTEÚDO -->
+  <main class="main-content">
+    <div class="top-bar">
+      <div class="page-title">Dashboard</div>
+      <div class="top-bar-actions">
+        <span style="font-size:13px;color:var(--color-text-muted)" id="data-hoje-top"></span>
+      </div>
+    </div>
+
+    <div class="page-body">
+
+      <!-- Banner hoje -->
+      <div class="hoje-banner">
+        <div>
+          <div class="data-hoje" id="banner-data"></div>
+          <div class="mes-ano"   id="banner-mes"></div>
+        </div>
+        <button class="btn-gerar" onclick="window.location.href='mensal.html'">
+          📅 Ver Escala Mensal
+        </button>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-grid" id="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">Em Turno Hoje</div>
+          <div class="stat-value" id="stat-turno">—</div>
+          <div class="stat-sub">colaboradores</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">De Folga</div>
+          <div class="stat-value" id="stat-folga">—</div>
+          <div class="stat-sub">colaboradores</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">De Férias</div>
+          <div class="stat-value" id="stat-ferias">—</div>
+          <div class="stat-sub">este mês</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Escala Mensal</div>
+          <div class="stat-value" id="stat-escala">—</div>
+          <div class="stat-sub" id="stat-escala-sub">—</div>
+        </div>
+      </div>
+
+      <!-- Grupos hoje -->
+      <div class="secao-titulo">Grupos — Hoje</div>
+      <div class="grupos-grid" id="grupos-hoje">
+        <div class="loading">A carregar grupos...</div>
+      </div>
+
+      <!-- Semana actual -->
+      <div class="secao-titulo" style="margin-top:8px;">Esta Semana — Grupos de Turno</div>
+      <div class="card" id="card-semana">
+        <div class="loading">A carregar semana...</div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script>
+  // ── Init ────────────────────────────────────────────────
+  const user = requireAuth();
+  const { tema, escuro } = carregarTema();
+
+  // Dados do utilizador na sidebar
+  document.getElementById('user-nome').textContent  = user.nome;
+  document.getElementById('user-nivel').textContent = user.nivel;
+  document.getElementById('user-avatar').textContent = user.nome.charAt(0).toUpperCase();
+
+  // Tema dots
+  document.querySelectorAll('.tema-dot').forEach(d => {
+    if (d.dataset.tema === tema) d.classList.add('active');
+  });
+
+  // Data de hoje
+  const hoje = new Date();
+  const diaHoje = hoje.getDate();
+  const mesHoje = hoje.getMonth() + 1;
+  const anoHoje = hoje.getFullYear();
+  const diaSemanaHoje = hoje.getDay();
+
+  document.getElementById('banner-data').textContent =
+    `${DIAS_SEMANA[diaSemanaHoje]}, ${diaHoje} de ${MESES[mesHoje-1]}`;
+  document.getElementById('banner-mes').textContent =
+    `${MESES[mesHoje-1]} ${anoHoje}`;
+  document.getElementById('data-hoje-top').textContent =
+    `${diaHoje} ${MESES[mesHoje-1].substring(0,3)} ${anoHoje}`;
+
+  // ── Tema ────────────────────────────────────────────────
+  function mudarTema(t) {
+    const e = localStorage.getItem('dm_escuro') === 'true';
+    guardarTema(t, e);
+    document.querySelectorAll('.tema-dot').forEach(d => d.classList.toggle('active', d.dataset.tema === t));
+  }
+  function toggleEscuro() {
+    const e = localStorage.getItem('dm_escuro') !== 'true';
+    guardarTema(localStorage.getItem('dm_tema') || 'azul', e);
+  }
+
+  // ── Carregar dados ──────────────────────────────────────
+  async function carregarDashboard() {
+    await carregarGruposHoje();
+    await carregarEscalaMes();
+    await carregarSemana();
+  }
+
+  // Grupos e turnos de hoje baseado no padrão 2+2+4
+  async function carregarGruposHoje() {
+    const grupos = await db.query('escala_grupos',
+      'activo=eq.true&tipo=eq.turno&order=ordem.asc&select=*'
+    );
+
+    // Buscar o estado do padrão do mês actual para cada grupo
+    const estados = await db.query('escala_padrao_estado',
+      `ano=eq.${anoHoje}&mes=eq.${mesHoje}&select=*`
+    );
+
+    const container = document.getElementById('grupos-hoje');
+
+    if (!grupos || grupos.length === 0) {
+      container.innerHTML = '<div class="aviso-sem-escala"><div class="icon">⚙️</div><p>Grupos não configurados</p></div>';
+      return;
+    }
+
+    // Buscar membros de cada grupo
+    const membros = await db.query('collaborators',
+      `faz_turno=eq.true&active=eq.true&select=id,name,funcao_grupo,grupo_id`
+    );
+
+    let html = '';
+    let totalTurno = 0;
+    let totalFolga = 0;
+
+    for (const g of grupos) {
+      // Calcular turno de hoje com base no offset do grupo
+      const offset = g.offset_inicio || 0;
+
+      // Buscar dia_inicio do mês no estado guardado
+      let diaInicio = offset;
+      const estado = estados ? estados.find(e => e.grupo_id === g.id) : null;
+      if (estado) {
+        diaInicio = estado.dias_feitos || offset;
+      }
+
+      const turnoHoje = calcularTurno(offset, diaHoje, diaInicio);
+      const cls = turnoHoje === '07/19' ? 'manha' : turnoHoje === '19/07' ? 'noite' : 'folga';
+      const label = turnoHoje === '07/19' ? '07h – 19h' : turnoHoje === '19/07' ? '19h – 07h' : 'Folga';
+
+      const memGrupo = membros ? membros.filter(m => m.grupo_id === g.id) : [];
+
+      if (turnoHoje !== 'Folga') totalTurno += memGrupo.length;
+      else totalFolga += memGrupo.length;
+
+      const membrosHtml = memGrupo.slice(0, 5).map(m =>
+        `<div class="membro-item">
+          <span class="dot"></span>
+          <span>${abreviarNome(m.name)}</span>
+        </div>`
+      ).join('');
+
+      html += `
+        <div class="grupo-card ${cls}">
+          <div class="grupo-nome">Grupo ${g.codigo}</div>
+          <span class="turno-badge ${cls}">${label}</span>
+          <div class="membros">${membrosHtml || '<span style="color:var(--color-text-muted)">Sem membros</span>'}</div>
+        </div>`;
+    }
+
+    container.innerHTML = html;
+    document.getElementById('stat-turno').textContent = totalTurno;
+    document.getElementById('stat-folga').textContent = totalFolga;
+  }
+
+  // Estado da escala do mês
+  async function carregarEscalaMes() {
+    const escalas = await db.query('escala_mensal',
+      `ano=eq.${anoHoje}&mes=eq.${mesHoje}&select=*`
+    );
+    const statEl    = document.getElementById('stat-escala');
+    const statSub   = document.getElementById('stat-escala-sub');
+    const statFerias = document.getElementById('stat-ferias');
+
+    if (!escalas || escalas.length === 0) {
+      statEl.textContent  = '—';
+      statSub.textContent = 'Não gerada';
+      statFerias.textContent = '0';
+      return;
+    }
+
+    const escala = escalas[0];
+    const estadoLabel = { rascunho: 'Rascunho', publicada: 'Publicada', encerrada: 'Encerrada' };
+    statEl.textContent  = estadoLabel[escala.estado] || escala.estado;
+    statSub.textContent = `${MESES[mesHoje-1]} ${anoHoje}`;
+
+    // Contar férias
+    const excecoes = await db.query('escala_excecoes',
+      `escala_id=eq.${escala.id}&tipo=eq.ferias&select=id`
+    );
+    statFerias.textContent = excecoes ? excecoes.length : '0';
+  }
+
+  // Semana actual — turnos dos 4 grupos
+  async function carregarSemana() {
+    const cardSemana = document.getElementById('card-semana');
+
+    const grupos = await db.query('escala_grupos',
+      'activo=eq.true&tipo=eq.turno&order=ordem.asc&select=*'
+    );
+
+    if (!grupos || grupos.length === 0) {
+      cardSemana.innerHTML = '<div class="aviso-sem-escala"><div class="icon">📅</div><p>Configure os grupos primeiro</p></div>';
+      return;
+    }
+
+    // Calcular os 7 dias desta semana (Seg a Dom)
+    const inicioSemana = new Date(hoje);
+    inicioSemana.setDate(hoje.getDate() - ((diaSemanaHoje + 6) % 7)); // Segunda
+
+    const dias = [];
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(inicioSemana);
+      d.setDate(inicioSemana.getDate() + i);
+      dias.push(d);
+    }
+
+    // Cabeçalho
+    let html = `<div class="table-wrap"><table class="semana-table">
+      <thead><tr>
+        <th class="col-nome">Grupo</th>`;
+
+    dias.forEach(d => {
+      const isHoje = d.toDateString() === hoje.toDateString();
+      html += `<th class="${isHoje ? 'dia-hoje' : ''}">${DIAS_SEMANA[d.getDay()]}<br><small>${d.getDate()}/${d.getMonth()+1}</small></th>`;
+    });
+    html += '</tr></thead><tbody>';
+
+    // Linhas por grupo
+    for (const g of grupos) {
+      const offset = g.offset_inicio || 0;
+      html += `<tr><td class="col-nome">Grupo ${g.codigo}</td>`;
+
+      dias.forEach(d => {
+        const dia = d.getDate();
+        const mes = d.getMonth() + 1;
+        const ano = d.getFullYear();
+        // Para simplificar, usa sempre o offset base (sem estado guardado)
+        const turno = calcularTurno(offset, dia, offset);
+        const isHoje = d.toDateString() === hoje.toDateString();
+        const ct = corTurno(turno);
+        html += `<td class="${isHoje ? 'dia-hoje' : ''}">
+          <span class="badge-turno" style="background:${ct.bg};color:${ct.text}">${turno}</span>
+        </td>`;
+      });
+
+      html += '</tr>';
+    }
+
+    html += '</tbody></table></div>';
+    cardSemana.innerHTML = html;
+  }
+
+  // Arrancar
+  carregarDashboard();
+</script>
+</body>
+</html>
