@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Danmo Escalas — Login</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase.js"></script>
+  <script src="tema.js"></script>
+  <style>
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background: var(--color-bg);
+    }
+
+    .login-wrap {
+      width: 100%;
+      max-width: 380px;
+      padding: 20px;
+      animation: fadeIn .4s ease;
+    }
+
+    .login-logo {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    .login-logo .marca {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--color-accent);
+      letter-spacing: 1px;
+    }
+    .login-logo .modulo {
+      font-size: 13px;
+      color: var(--color-text-muted);
+      margin-top: 4px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+    .login-logo .separador {
+      width: 40px;
+      height: 3px;
+      background: var(--color-secondary);
+      margin: 12px auto 0;
+      border-radius: 2px;
+    }
+
+    .login-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 12px;
+      padding: 28px;
+      box-shadow: var(--shadow);
+    }
+    .login-card h2 {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--color-text);
+      margin-bottom: 6px;
+    }
+    .login-card p {
+      font-size: 13px;
+      color: var(--color-text-muted);
+      margin-bottom: 24px;
+    }
+
+    .input-group {
+      position: relative;
+      margin-bottom: 16px;
+    }
+    .input-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--color-text-muted);
+      font-size: 16px;
+      pointer-events: none;
+    }
+    .input-group input {
+      width: 100%;
+      padding: 11px 12px 11px 38px;
+      background: var(--color-bg);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius);
+      color: var(--color-text);
+      font-size: 14px;
+      transition: border-color .2s;
+    }
+    .input-group input:focus {
+      outline: none;
+      border-color: var(--color-secondary);
+    }
+    .input-group input::placeholder { color: var(--color-text-muted); }
+
+    .btn-login {
+      width: 100%;
+      padding: 12px;
+      background: var(--color-secondary);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius);
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: filter .2s;
+      margin-top: 8px;
+    }
+    .btn-login:hover { filter: brightness(1.1); }
+    .btn-login:disabled { opacity: .6; cursor: not-allowed; filter: none; }
+
+    .erro-msg {
+      background: rgba(244,67,54,0.12);
+      border: 1px solid rgba(244,67,54,0.3);
+      color: #fc8181;
+      border-radius: var(--radius);
+      padding: 10px 14px;
+      font-size: 13px;
+      margin-top: 14px;
+      display: none;
+    }
+    .erro-msg.visivel { display: block; }
+
+    .login-footer {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 11px;
+      color: var(--color-text-muted);
+    }
+
+    .outros-modulos {
+      margin-top: 24px;
+      text-align: center;
+    }
+    .outros-modulos p {
+      font-size: 11px;
+      color: var(--color-text-muted);
+      margin-bottom: 8px;
+    }
+    .modulos-links {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+    }
+    .modulos-links a {
+      font-size: 12px;
+      color: var(--color-text-muted);
+      text-decoration: none;
+      padding: 4px 10px;
+      border: 1px solid var(--color-border);
+      border-radius: 20px;
+      transition: all .2s;
+    }
+    .modulos-links a:hover {
+      border-color: var(--color-secondary);
+      color: var(--color-secondary);
+    }
+  </style>
+</head>
+<body>
+  <div class="login-wrap">
+    <div class="login-logo">
+      <div class="marca">DANMO SS</div>
+      <div class="modulo">Gestão de Escalas</div>
+      <div class="separador"></div>
+    </div>
+
+    <div class="login-card">
+      <h2>Entrar no sistema</h2>
+      <p>Use o seu código DM e senha de acesso.</p>
+
+      <div class="input-group">
+        <span class="input-icon">👤</span>
+        <input type="text" id="inp-codigo" placeholder="Código (ex: DM0069)"
+               maxlength="10" autocomplete="off" autocapitalize="characters">
+      </div>
+
+      <div class="input-group">
+        <span class="input-icon">🔒</span>
+        <input type="password" id="inp-senha" placeholder="Senha" autocomplete="current-password">
+      </div>
+
+      <button class="btn-login" id="btn-entrar" onclick="entrar()">Entrar</button>
+
+      <div class="erro-msg" id="erro-msg"></div>
+    </div>
+
+    <div class="outros-modulos">
+      <p>Outros módulos</p>
+      <div class="modulos-links">
+        <a href="https://filomeno1989.github.io/danmo-billing" target="_blank">💰 Financeiro</a>
+        <a href="https://filomeno1989.github.io/danmo-stock" target="_blank">📦 Stock</a>
+      </div>
+    </div>
+
+    <div class="login-footer">
+      Danmo Service System, Lda — Porto da Beira
+    </div>
+  </div>
+
+  <script src="auth.js"></script>
+  <script>
+    // Aplicar tema guardado
+    carregarTema();
+
+    // Se já está autenticado, redirecionar
+    if (getUser()) window.location.href = 'dashboard.html';
+
+    // Enter para submeter
+    document.getElementById('inp-senha').addEventListener('keydown', e => {
+      if (e.key === 'Enter') entrar();
+    });
+    document.getElementById('inp-codigo').addEventListener('keydown', e => {
+      if (e.key === 'Enter') document.getElementById('inp-senha').focus();
+    });
+
+    async function entrar() {
+      const codigo = document.getElementById('inp-codigo').value.trim().toUpperCase();
+      const senha  = document.getElementById('inp-senha').value;
+      const btn    = document.getElementById('btn-entrar');
+      const erro   = document.getElementById('erro-msg');
+
+      erro.classList.remove('visivel');
+
+      if (!codigo || !senha) {
+        erro.textContent = 'Preencha o código e a senha.';
+        erro.classList.add('visivel');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'A entrar…';
+
+      const res = await login(codigo, senha);
+
+      if (res.ok) {
+        window.location.href = 'dashboard.html';
+      } else {
+        erro.textContent = res.erro;
+        erro.classList.add('visivel');
+        btn.disabled = false;
+        btn.textContent = 'Entrar';
+      }
+    }
+  </script>
+</body>
+</html>
