@@ -3,28 +3,30 @@
 const AUTH_KEY = 'dm_escalas_user';
 
 async function login(codigo, senha) {
-  const { data, error } = await supabase
-    .from('utilizadores')
-    .select('*')
-    .eq('codigo', codigo.toUpperCase())
-    .eq('senha', senha)
-    .eq('activo', true)
-    .single();
+  const dados = await db.get('utilizadores', {
+    codigo: codigo.toUpperCase(),
+    senha: senha,
+    activo: true
+  });
 
-  if (error || !data) return { ok: false, erro: 'Código ou senha incorrectos.' };
+  if (!dados || dados.length === 0) {
+    return { ok: false, erro: 'Código ou senha incorrectos.' };
+  }
 
-  // Verificar se tem acesso ao módulo Escalas
+  const user = dados[0];
   const niveis = ['Admin', 'Gestor', 'Operador'];
-  if (!niveis.includes(data.nivel)) return { ok: false, erro: 'Sem permissão de acesso.' };
+  if (!niveis.includes(user.nivel)) {
+    return { ok: false, erro: 'Sem permissão de acesso.' };
+  }
 
   sessionStorage.setItem(AUTH_KEY, JSON.stringify({
-    id:     data.id,
-    codigo: data.codigo,
-    nome:   data.nome,
-    nivel:  data.nivel
+    id:     user.id,
+    codigo: user.codigo,
+    nome:   user.nome,
+    nivel:  user.nivel
   }));
 
-  return { ok: true, user: data };
+  return { ok: true, user };
 }
 
 function getUser() {
