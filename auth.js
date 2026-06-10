@@ -1,29 +1,27 @@
 // auth.js — Danmo Escalas
+// Autenticação temporariamente desactivada — login real no portal principal
 
 const AUTH_KEY = 'dm_escalas_user';
 
+// Login temporário — aceita qualquer código DM conhecido
 async function login(codigo, senha) {
-  const dados = await db.get('utilizadores', {
-    codigo: codigo.toUpperCase(),
-    senha: senha,
-    activo: true
-  });
+  // Utilizadores temporários enquanto o portal principal não está pronto
+  const temp = {
+    'DM0069': { nome: 'Filomeno Alexandre', nivel: 'admin',  cargo: 'Ass. Administrativo' },
+    'DM0034': { nome: 'Manuel Nhandere',    nivel: 'gestor', cargo: 'Fiel de Armazem' },
+  };
 
-  if (!dados || dados.length === 0) {
-    return { ok: false, erro: 'Código ou senha incorrectos.' };
-  }
+  const user = temp[codigo.toUpperCase()];
+  if (!user) return { ok: false, erro: 'Código não reconhecido.' };
 
-  const user = dados[0];
-  const niveis = ['Admin', 'Gestor', 'Operador'];
-  if (!niveis.includes(user.nivel)) {
-    return { ok: false, erro: 'Sem permissão de acesso.' };
-  }
+  // Senha temporária igual para todos: danmo2026
+  if (senha !== 'danmo2026') return { ok: false, erro: 'Senha incorrecta.' };
 
   sessionStorage.setItem(AUTH_KEY, JSON.stringify({
-    id:     user.id,
-    codigo: user.codigo,
+    codigo: codigo.toUpperCase(),
     nome:   user.nome,
-    nivel:  user.nivel
+    nivel:  user.nivel,
+    cargo:  user.cargo
   }));
 
   return { ok: true, user };
@@ -48,5 +46,5 @@ function requireAuth() {
   return user;
 }
 
-function isAdmin()  { const u = getUser(); return u && u.nivel === 'Admin'; }
-function isGestor() { const u = getUser(); return u && ['Admin','Gestor'].includes(u.nivel); }
+function isAdmin()  { const u = getUser(); return u && u.nivel === 'admin'; }
+function isGestor() { const u = getUser(); return u && ['admin','gestor'].includes(u.nivel); }
