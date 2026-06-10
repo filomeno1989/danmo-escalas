@@ -316,7 +316,7 @@
   // Grupos e turnos de hoje baseado no padrão 2+2+4
   async function carregarGruposHoje() {
     const grupos = await db.query('escala_grupos',
-      'activo=eq.true&tipo=eq.turno&order=ordem.asc&select=*'
+      'tipo=eq.turno&order=ordem.asc&select=*'
     );
 
     // Buscar o estado do padrão do mês actual para cada grupo
@@ -413,7 +413,7 @@
     const cardSemana = document.getElementById('card-semana');
 
     const grupos = await db.query('escala_grupos',
-      'activo=eq.true&tipo=eq.turno&order=ordem.asc&select=*'
+      'tipo=eq.turno&order=ordem.asc&select=*'
     );
 
     if (!grupos || grupos.length === 0) {
