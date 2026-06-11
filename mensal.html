@@ -10,269 +10,116 @@
   <script src="auth.js"></script>
   <script src="utils.js"></script>
   <style>
-    /* ── Toolbar ─────────────────────────────────────────── */
-    .toolbar {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-bottom: 20px;
-    }
-    .toolbar select {
-      padding: 8px 12px;
-      background: var(--color-surface);
-      border: 1px solid var(--color-border);
-      border-radius: var(--radius);
-      color: var(--color-text);
-      font-size: 14px;
-      cursor: pointer;
-    }
-    .estado-badge {
-      display: inline-block;
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 600;
-    }
-    .estado-rascunho  { background: rgba(255,193,7,0.15);  color: #fbd38d; }
-    .estado-publicada { background: rgba(76,175,80,0.15);  color: #9ae6b4; }
-    .estado-encerrada { background: rgba(96,125,139,0.15); color: #a0aec0; }
+    .toolbar { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:16px; }
+    .toolbar select { padding:8px 12px; background:var(--color-surface); border:1px solid var(--color-border); border-radius:var(--radius); color:var(--color-text); font-size:14px; cursor:pointer; }
+    .estado-badge { display:inline-block; padding:4px 12px; border-radius:20px; font-size:12px; font-weight:600; }
+    .estado-rascunho  { background:rgba(255,193,7,0.15);  color:#fbd38d; }
+    .estado-publicada { background:rgba(76,175,80,0.15);  color:#9ae6b4; }
+    .estado-encerrada { background:rgba(96,125,139,0.15); color:#a0aec0; }
 
-    /* ── Grade mensal ────────────────────────────────────── */
-    .grade-wrap {
-      overflow-x: auto;
-      border-radius: var(--radius);
-      border: 1px solid var(--color-border);
-    }
-    .grade-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 12px;
-      min-width: 900px;
-    }
+    /* Grade */
+    .grade-wrap { overflow-x:auto; border-radius:var(--radius); border:1px solid var(--color-border); }
+    .grade-table { width:100%; border-collapse:collapse; font-size:11px; min-width:1000px; }
     .grade-table th {
-      background: var(--color-bg);
-      color: var(--color-text-muted);
-      font-size: 10px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: .5px;
-      padding: 7px 4px;
-      text-align: center;
-      border-bottom: 2px solid var(--color-border);
-      border-right: 1px solid var(--color-border);
-      white-space: nowrap;
-      position: sticky;
-      top: 0;
-      z-index: 10;
+      background:var(--color-bg); color:var(--color-text-muted);
+      font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.4px;
+      padding:6px 3px; text-align:center;
+      border-bottom:2px solid var(--color-border); border-right:1px solid var(--color-border);
+      white-space:nowrap; position:sticky; top:0; z-index:10;
     }
-    .grade-table th.th-nome {
-      text-align: left;
-      padding-left: 12px;
-      min-width: 160px;
-      position: sticky;
-      left: 0;
-      z-index: 20;
-      background: var(--color-bg);
-    }
-    .grade-table th.th-dia {
-      min-width: 38px;
-      width: 38px;
-    }
-    .grade-table th.th-fds { color: #fc8181; }
-    .grade-table th.th-fer { color: #f6e05e; }
+    .th-nome { text-align:left !important; padding-left:10px !important; min-width:155px; position:sticky !important; left:0; z-index:20; background:var(--color-bg) !important; }
+    .th-dia  { min-width:34px; width:34px; }
+    .th-fds  { color:#fc8181; }
+    .th-fer  { color:#f6e05e; }
+    .th-hoje-h { background:rgba(33,150,243,0.2) !important; color:#90cdf4 !important; }
 
-    /* Linhas de grupo */
-    .tr-grupo-header td {
-      background: var(--color-primary);
-      color: var(--color-accent);
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      padding: 6px 12px;
-      border-bottom: 1px solid var(--color-border);
+    /* Linhas de secção */
+    .tr-seccao td {
+      background:var(--color-primary); color:var(--color-accent);
+      font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:1px;
+      padding:5px 10px; border-bottom:1px solid var(--color-border);
     }
+    /* Linha de contagem */
+    .tr-count td {
+      background:rgba(0,0,0,0.3); color:var(--color-text-muted);
+      font-size:10px; font-weight:600; text-align:center;
+      padding:3px; border-top:2px solid var(--color-border);
+    }
+    .tr-count .td-count-nome { text-align:left; padding-left:10px; color:var(--color-accent); }
 
-    /* Células de colaborador */
+    /* Células */
     .grade-table td {
-      border-right: 1px solid var(--color-border);
-      border-bottom: 1px solid var(--color-border);
-      padding: 0;
-      text-align: center;
-      vertical-align: middle;
+      border-right:1px solid var(--color-border); border-bottom:1px solid var(--color-border);
+      padding:0; text-align:center; vertical-align:middle;
     }
     .td-nome {
-      text-align: left;
-      padding: 6px 12px;
-      font-size: 12px;
-      font-weight: 500;
-      color: var(--color-text);
-      white-space: nowrap;
-      position: sticky;
-      left: 0;
-      background: var(--color-surface);
-      z-index: 5;
-      min-width: 160px;
+      text-align:left; padding:5px 10px; font-size:11px; font-weight:500; color:var(--color-text);
+      white-space:nowrap; position:sticky; left:0; background:var(--color-surface); z-index:5; min-width:155px;
     }
-    .td-nome .categoria {
-      font-size: 10px;
-      color: var(--color-text-muted);
-      font-weight: 400;
-    }
-    .td-folgas {
-      padding: 4px 8px;
-      font-size: 11px;
-      text-align: center;
-      color: var(--color-text-muted);
-      white-space: nowrap;
-      min-width: 36px;
-    }
+    .td-nome.chefe { font-weight:700; color:#fbd38d; }
+    .td-nome .cat  { font-size:9px; color:var(--color-text-muted); font-weight:400; display:block; }
+    .td-folga-val  { padding:3px 5px; font-size:10px; text-align:center; color:var(--color-text-muted); min-width:30px; }
+    .td-hoje { background:rgba(33,150,243,0.04); }
 
-    /* Célula de turno — clicável */
-    .cell-turno {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 34px;
-      font-size: 10px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: filter .15s;
-      letter-spacing: .3px;
-      user-select: none;
+    /* Célula turno */
+    .ct {
+      display:flex; align-items:center; justify-content:center;
+      height:30px; font-size:10px; font-weight:700; cursor:pointer;
+      transition:filter .15s; letter-spacing:.2px; user-select:none;
     }
-    .cell-turno:hover { filter: brightness(1.3); }
-    .cell-turno.ct-manha  { background: #1a3a5c; color: #90cdf4; }
-    .cell-turno.ct-noite  { background: #2d1b4e; color: #d6bcfa; }
-    .cell-turno.ct-folga  { background: #111d11; color: #4a7a4a; }
-    .cell-turno.ct-ferias { background: #3d2600; color: #fbd38d; }
-    .cell-turno.ct-ld     { background: #3d1515; color: #fc8181; }
-    .cell-turno.ct-norm   { background: #1a2535; color: #718096; }
-    .cell-turno.ct-frd    { background: #2d2d00; color: #f6e05e; }
-    .cell-turno.ct-sup    { background: #1a2535; color: #76e4f7; }
-    .cell-turno.ct-vazio  { background: transparent; color: transparent; }
+    .ct:hover { filter:brightness(1.4); }
+    .ct-M  { background:#1a3a5c; color:#90cdf4; }
+    .ct-N  { background:#2d1b4e; color:#d6bcfa; }
+    .ct-F  { background:#0f1f0f; color:#4a7a4a; }
+    .ct-Fe { background:#3d2600; color:#fbd38d; }
+    .ct-LD { background:#3d1515; color:#fc8181; }
+    .ct-LDi{ background:#5c1a1a; color:#feb2b2; }
+    .ct-Nr { background:#1a2535; color:#718096; }
+    .ct-FR { background:#2d2d00; color:#f6e05e; }
+    .ct-Sp { background:#163030; color:#76e4f7; }
+    .ct-Ec { background:#1a3020; color:#68d391; }
+    .ct-CC { background:#2d1f00; color:#f6ad55; }
+    .ct-vz { background:transparent; color:transparent; }
 
-    /* Dia de hoje destacado */
-    .th-hoje { background: rgba(33,150,243,0.2) !important; color: #90cdf4 !important; }
-    .td-hoje { background: rgba(33,150,243,0.05); }
+    /* Legenda */
+    .legenda { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:14px; }
+    .leg { display:flex; align-items:center; gap:4px; font-size:11px; color:var(--color-text-muted); }
+    .leg-c { width:22px; height:13px; border-radius:2px; display:flex; align-items:center; justify-content:center; font-size:8px; font-weight:700; }
 
-    /* ── Modal de edição de célula ───────────────────────── */
-    .turno-picker {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-      margin-top: 8px;
-    }
-    .turno-opt {
-      padding: 10px 6px;
-      border-radius: var(--radius);
-      border: 2px solid transparent;
-      cursor: pointer;
-      text-align: center;
-      font-size: 13px;
-      font-weight: 600;
-      transition: all .15s;
-    }
-    .turno-opt:hover { filter: brightness(1.2); }
-    .turno-opt.selected { border-color: var(--color-accent); }
-    .turno-opt.opt-manha  { background: #1a3a5c; color: #90cdf4; }
-    .turno-opt.opt-noite  { background: #2d1b4e; color: #d6bcfa; }
-    .turno-opt.opt-folga  { background: #1a2e1a; color: #9ae6b4; }
-    .turno-opt.opt-ferias { background: #3d2600; color: #fbd38d; }
-    .turno-opt.opt-ld     { background: #3d1515; color: #fc8181; }
-    .turno-opt.opt-norm   { background: #1a2535; color: #a0aec0; }
-    .turno-opt.opt-frd    { background: #2d2d00; color: #f6e05e; }
-    .turno-opt.opt-sup    { background: #163030; color: #76e4f7; }
+    /* Tabs */
+    .tabs { display:flex; gap:2px; border-bottom:1px solid var(--color-border); margin-bottom:18px; }
+    .tab-btn { padding:8px 16px; background:none; border:none; color:var(--color-text-muted); font-size:13px; font-weight:500; cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-1px; transition:all .2s; }
+    .tab-btn.active { color:var(--color-secondary); border-bottom-color:var(--color-secondary); }
+    .tab-panel { display:none; }
+    .tab-panel.active { display:block; }
 
-    /* ── Painel de excepções ─────────────────────────────── */
-    .excecoes-lista {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      margin-bottom: 16px;
-    }
-    .excecao-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: var(--color-bg);
-      border: 1px solid var(--color-border);
-      border-radius: var(--radius);
-      padding: 10px 14px;
-      font-size: 13px;
-    }
-    .excecao-item .ex-nome { font-weight: 600; }
-    .excecao-item .ex-tipo {
-      font-size: 11px;
-      padding: 2px 8px;
-      border-radius: 10px;
-      background: rgba(255,193,7,0.15);
-      color: #fbd38d;
-    }
-    .excecao-item .ex-dias { color: var(--color-text-muted); font-size: 12px; }
+    /* Modal turno picker */
+    .turno-picker { display:grid; grid-template-columns:repeat(4,1fr); gap:7px; margin-top:10px; }
+    .t-opt { padding:9px 4px; border-radius:var(--radius); border:2px solid transparent; cursor:pointer; text-align:center; font-size:12px; font-weight:700; transition:all .15s; }
+    .t-opt:hover { filter:brightness(1.2); }
+    .t-opt.sel { border-color:var(--color-accent); }
+    .t-opt-M  { background:#1a3a5c; color:#90cdf4; }
+    .t-opt-N  { background:#2d1b4e; color:#d6bcfa; }
+    .t-opt-F  { background:#1a2e1a; color:#9ae6b4; }
+    .t-opt-Fe { background:#3d2600; color:#fbd38d; }
+    .t-opt-LD { background:#3d1515; color:#fc8181; }
+    .t-opt-LDi{ background:#5c1a1a; color:#feb2b2; }
+    .t-opt-Nr { background:#1a2535; color:#a0aec0; }
+    .t-opt-FR { background:#2d2d00; color:#f6e05e; }
+    .t-opt-Sp { background:#163030; color:#76e4f7; }
+    .t-opt-Ec { background:#1a3020; color:#68d391; }
+    .t-opt-CC { background:#2d1f00; color:#f6ad55; }
 
-    /* ── Legenda ─────────────────────────────────────────── */
-    .legenda {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-bottom: 16px;
-    }
-    .leg-item {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      font-size: 11px;
-      color: var(--color-text-muted);
-    }
-    .leg-cor {
-      width: 24px; height: 14px;
-      border-radius: 3px;
-      font-size: 9px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-    }
-
-    /* ── Tabs ────────────────────────────────────────────── */
-    .tabs {
-      display: flex;
-      gap: 2px;
-      border-bottom: 1px solid var(--color-border);
-      margin-bottom: 20px;
-    }
-    .tab-btn {
-      padding: 9px 18px;
-      background: none;
-      border: none;
-      color: var(--color-text-muted);
-      font-size: 13px;
-      font-weight: 500;
-      cursor: pointer;
-      border-bottom: 2px solid transparent;
-      margin-bottom: -1px;
-      transition: all .2s;
-    }
-    .tab-btn.active {
-      color: var(--color-secondary);
-      border-bottom-color: var(--color-secondary);
-    }
-    .tab-btn:hover { color: var(--color-text); }
-    .tab-panel { display: none; }
-    .tab-panel.active { display: block; }
+    /* Excepções */
+    .exc-item { display:flex; align-items:center; justify-content:space-between; background:var(--color-bg); border:1px solid var(--color-border); border-radius:var(--radius); padding:10px 14px; font-size:13px; margin-bottom:8px; }
+    .exc-nome { font-weight:600; }
+    .exc-tipo { font-size:11px; padding:2px 8px; border-radius:10px; background:rgba(255,193,7,0.15); color:#fbd38d; }
   </style>
 </head>
 <body>
 <div class="app-layout">
-
-  <!-- SIDEBAR -->
   <aside class="sidebar">
-    <div class="sidebar-logo">
-      <div class="app-name">DANMO SS</div>
-      <div class="app-sub">Gestão de Escalas</div>
-    </div>
+    <div class="sidebar-logo"><div class="app-name">DANMO SS</div><div class="app-sub">Gestão de Escalas</div></div>
     <nav class="sidebar-nav">
       <div class="nav-section">Menu</div>
       <a class="nav-item" href="dashboard.html"><span class="icon">🏠</span> Dashboard</a>
@@ -288,10 +135,7 @@
     <div class="sidebar-footer">
       <div class="user-info">
         <div class="user-avatar" id="user-avatar">F</div>
-        <div>
-          <div class="user-name"  id="user-nome">—</div>
-          <div class="user-nivel" id="user-nivel">—</div>
-        </div>
+        <div><div class="user-name" id="user-nome">—</div><div class="user-nivel" id="user-nivel">—</div></div>
       </div>
       <div style="display:flex;gap:6px;margin-bottom:8px;">
         <div class="tema-selector">
@@ -307,20 +151,17 @@
     </div>
   </aside>
 
-  <!-- CONTEÚDO -->
   <main class="main-content">
     <div class="top-bar">
       <div class="page-title" id="titulo-pagina">Escala Mensal</div>
       <div class="top-bar-actions">
         <span class="estado-badge" id="badge-estado" style="display:none"></span>
-        <button class="btn btn-ghost btn-sm" onclick="window.location.href='semanal.html'">📋 Ver Semanal</button>
+        <button class="btn btn-ghost btn-sm" onclick="window.location.href='semanal.html'">📋 Semanal</button>
         <button class="btn btn-accent btn-sm" id="btn-publicar" style="display:none" onclick="publicarEscala()">✅ Publicar</button>
       </div>
     </div>
 
     <div class="page-body">
-
-      <!-- Toolbar -->
       <div class="toolbar">
         <select id="sel-mes" onchange="mudarMes()">
           <option value="1">Janeiro</option><option value="2">Fevereiro</option>
@@ -335,721 +176,613 @@
           <option value="2026" selected>2026</option>
           <option value="2027">2027</option>
         </select>
-        <button class="btn btn-primary btn-sm" id="btn-gerar" onclick="confirmarGerar()">
-          ⚡ Gerar Escala
-        </button>
-        <button class="btn btn-ghost btn-sm" onclick="abrirExcecoes()">
-          ✏️ Excepções
-        </button>
+        <button class="btn btn-primary btn-sm" onclick="confirmarGerar()">⚡ Gerar Escala</button>
+        <button class="btn btn-ghost btn-sm" onclick="mudarTab('excecoes')">✏️ Excepções</button>
         <div style="flex:1"></div>
-        <span style="font-size:12px;color:var(--color-text-muted)" id="info-guardado"></span>
+        <span style="font-size:11px;color:var(--color-text-muted)" id="info-guardado"></span>
       </div>
 
-      <!-- Legenda -->
       <div class="legenda">
-        <div class="leg-item"><div class="leg-cor" style="background:#1a3a5c;color:#90cdf4">M</div> 07/19</div>
-        <div class="leg-item"><div class="leg-cor" style="background:#2d1b4e;color:#d6bcfa">N</div> 19/07</div>
-        <div class="leg-item"><div class="leg-cor" style="background:#1a2e1a;color:#9ae6b4">F</div> Folga</div>
-        <div class="leg-item"><div class="leg-cor" style="background:#3d2600;color:#fbd38d">Fér</div> Férias</div>
-        <div class="leg-item"><div class="leg-cor" style="background:#3d1515;color:#fc8181">LD</div> Lic. Doença</div>
-        <div class="leg-item"><div class="leg-cor" style="background:#1a2535;color:#a0aec0">Nr</div> Normal</div>
-        <div class="leg-item"><div class="leg-cor" style="background:#2d2d00;color:#f6e05e">Fr</div> Feriado</div>
-        <div class="leg-item"><div class="leg-cor" style="background:#163030;color:#76e4f7">Sp</div> Supervisão</div>
+        <div class="leg"><div class="leg-c" style="background:#1a3a5c;color:#90cdf4">M</div>07/19</div>
+        <div class="leg"><div class="leg-c" style="background:#2d1b4e;color:#d6bcfa">N</div>19/07</div>
+        <div class="leg"><div class="leg-c" style="background:#0f1f0f;color:#4a7a4a">F</div>Folga</div>
+        <div class="leg"><div class="leg-c" style="background:#3d2600;color:#fbd38d">Fér</div>Férias</div>
+        <div class="leg"><div class="leg-c" style="background:#3d1515;color:#fc8181">LD</div>Lic.Doença</div>
+        <div class="leg"><div class="leg-c" style="background:#5c1a1a;color:#feb2b2">LDi</div>Lic.Disciplinar</div>
+        <div class="leg"><div class="leg-c" style="background:#1a2535;color:#718096">Nr</div>Normal</div>
+        <div class="leg"><div class="leg-c" style="background:#2d2d00;color:#f6e05e">FR</div>Feriado</div>
+        <div class="leg"><div class="leg-c" style="background:#163030;color:#76e4f7">Sp</div>Supervisor</div>
+        <div class="leg"><div class="leg-c" style="background:#1a3020;color:#68d391">Ec</div>Escala</div>
+        <div class="leg"><div class="leg-c" style="background:#2d1f00;color:#f6ad55">CC</div>CCIS</div>
       </div>
 
-      <!-- Tabs -->
       <div class="tabs">
         <button class="tab-btn active" onclick="mudarTab('grade')">📊 Grade Mensal</button>
         <button class="tab-btn" onclick="mudarTab('excecoes')">⚠️ Excepções</button>
         <button class="tab-btn" onclick="mudarTab('folgas')">📋 Folgas</button>
       </div>
 
-      <!-- Tab: Grade -->
       <div class="tab-panel active" id="tab-grade">
         <div id="grade-container">
-          <div class="empty-state">
-            <div class="icon">📅</div>
-            <p>Selecciona um mês e clica em <strong>Gerar Escala</strong> para começar.</p>
-          </div>
+          <div class="empty-state"><div class="icon">📅</div><p>Selecciona um mês e clica em <strong>⚡ Gerar Escala</strong>.</p></div>
         </div>
       </div>
 
-      <!-- Tab: Excepções -->
       <div class="tab-panel" id="tab-excecoes">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-          <div style="font-size:14px;color:var(--color-text-muted)">Férias, doenças e substituições deste mês</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+          <div style="font-size:13px;color:var(--color-text-muted)">Férias, doenças e substituições</div>
           <button class="btn btn-primary btn-sm" onclick="abrirModalExcecao()">+ Adicionar</button>
         </div>
-        <div class="excecoes-lista" id="excecoes-lista">
-          <div class="loading">A carregar...</div>
-        </div>
+        <div id="excecoes-lista"><div class="loading">A carregar...</div></div>
       </div>
 
-      <!-- Tab: Folgas -->
       <div class="tab-panel" id="tab-folgas">
-        <div style="font-size:13px;color:var(--color-text-muted);margin-bottom:16px;">
-          Saldo de folgas dos colaboradores de turno — actualizado automaticamente ao gerar a escala.
-        </div>
         <div class="card">
           <div class="table-wrap">
-            <table id="tabela-folgas">
-              <thead>
-                <tr>
-                  <th>Colaborador</th>
-                  <th>Grupo</th>
-                  <th style="text-align:center">Anterior</th>
-                  <th style="text-align:center">Feitas</th>
-                  <th style="text-align:center">Gozadas</th>
-                  <th style="text-align:center">Existente</th>
-                </tr>
-              </thead>
-              <tbody id="tbody-folgas">
-                <tr><td colspan="6" class="loading">A carregar...</td></tr>
-              </tbody>
+            <table>
+              <thead><tr>
+                <th>Colaborador</th><th>Grupo</th>
+                <th style="text-align:center">Anterior</th>
+                <th style="text-align:center">Feitas</th>
+                <th style="text-align:center">Gozadas</th>
+                <th style="text-align:center">Existente</th>
+              </tr></thead>
+              <tbody id="tbody-folgas"><tr><td colspan="6" class="loading">A carregar...</td></tr></tbody>
             </table>
           </div>
         </div>
       </div>
-
     </div>
   </main>
 </div>
 
-<!-- ── Modal: Editar célula ──────────────────────────────── -->
-<div class="modal-overlay" id="modal-celula" style="display:none" onclick="fecharModalCelula(event)">
-  <div class="modal" style="max-width:360px;">
+<!-- Modal: editar célula -->
+<div class="modal-overlay" id="modal-cel" style="display:none" onclick="if(event.target===this)fecharCel()">
+  <div class="modal" style="max-width:380px;">
     <div class="modal-header">
-      <div class="modal-title" id="modal-celula-titulo">Editar Turno</div>
-      <button class="modal-close" onclick="fecharModalCelula()">✕</button>
+      <div class="modal-title" id="cel-titulo">Editar Turno</div>
+      <button class="modal-close" onclick="fecharCel()">✕</button>
     </div>
     <div class="modal-body">
-      <div style="font-size:13px;color:var(--color-text-muted);margin-bottom:12px;" id="modal-celula-info"></div>
+      <div style="font-size:12px;color:var(--color-text-muted);margin-bottom:10px" id="cel-info"></div>
       <div class="turno-picker">
-        <div class="turno-opt opt-manha"  onclick="selecionarTurno('07/19')">07/19<br><small>Manhã</small></div>
-        <div class="turno-opt opt-noite"  onclick="selecionarTurno('19/07')">19/07<br><small>Noite</small></div>
-        <div class="turno-opt opt-folga"  onclick="selecionarTurno('Folga')">F<br><small>Folga</small></div>
-        <div class="turno-opt opt-ferias" onclick="selecionarTurno('Ferias')">Fér<br><small>Férias</small></div>
-        <div class="turno-opt opt-ld"     onclick="selecionarTurno('LD')">LD<br><small>Lic. Doença</small></div>
-        <div class="turno-opt opt-norm"   onclick="selecionarTurno('Norm.')">Nr<br><small>Normal</small></div>
-        <div class="turno-opt opt-frd"    onclick="selecionarTurno('FRD')">Fr<br><small>Feriado</small></div>
-        <div class="turno-opt opt-sup"    onclick="selecionarTurno('Sup.')">Sp<br><small>Supervisão</small></div>
+        <div class="t-opt t-opt-M"  onclick="gravarTurno('07/19')">M<br><small>07/19</small></div>
+        <div class="t-opt t-opt-N"  onclick="gravarTurno('19/07')">N<br><small>19/07</small></div>
+        <div class="t-opt t-opt-F"  onclick="gravarTurno('Folga')">F<br><small>Folga</small></div>
+        <div class="t-opt t-opt-Fe" onclick="gravarTurno('Ferias')">Fér<br><small>Férias</small></div>
+        <div class="t-opt t-opt-LD" onclick="gravarTurno('LD')">LD<br><small>Lic.Doença</small></div>
+        <div class="t-opt t-opt-LDi"onclick="gravarTurno('LDi')">LDi<br><small>Lic.Disc.</small></div>
+        <div class="t-opt t-opt-Nr" onclick="gravarTurno('Norm.')">Nr<br><small>Normal</small></div>
+        <div class="t-opt t-opt-FR" onclick="gravarTurno('FRD')">FR<br><small>Feriado</small></div>
+        <div class="t-opt t-opt-Sp" onclick="gravarTurno('Sup.')">Sp<br><small>Supervisor</small></div>
+        <div class="t-opt t-opt-Ec" onclick="gravarTurno('Esc.')">Ec<br><small>Escala</small></div>
+        <div class="t-opt t-opt-CC" onclick="gravarTurno('CCIS')">CC<br><small>CCIS</small></div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ── Modal: Excepção ───────────────────────────────────── -->
-<div class="modal-overlay" id="modal-excecao" style="display:none" onclick="fecharModalExcecao(event)">
+<!-- Modal: gerar -->
+<div class="modal-overlay" id="modal-gerar" style="display:none" onclick="if(event.target===this)fecharGerar()">
+  <div class="modal" style="max-width:420px;">
+    <div class="modal-header">
+      <div class="modal-title">⚡ Gerar Escala</div>
+      <button class="modal-close" onclick="fecharGerar()">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:13px;margin-bottom:14px" id="gerar-txt"></p>
+      <div class="form-group">
+        <label class="form-label">Posição do Grupo A no Dia 1</label>
+        <select class="form-control" id="gerar-pos">
+          <option value="0">1ª Manhã — 07/19 (dia 1 de 2)</option>
+          <option value="1">2ª Manhã — 07/19 (dia 2 de 2)</option>
+          <option value="2">1ª Noite — 19/07 (dia 1 de 2)</option>
+          <option value="3">2ª Noite — 19/07 (dia 2 de 2)</option>
+          <option value="4">1ª Folga</option>
+          <option value="5">2ª Folga</option>
+          <option value="6">3ª Folga</option>
+          <option value="7">4ª Folga</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Supervisor em escala — Semana 1</label>
+        <select class="form-control" id="gerar-sup">
+          <option value="0">DM0026 — Mario Jose Guiliche (Eléctrico)</option>
+          <option value="1">DM0022 — Pedro Bongesse Andicene (Serralharia)</option>
+          <option value="2">DM0021 — Afonso Henrique Janasse (Mecânico)</option>
+        </select>
+      </div>
+      <p style="font-size:11px;color:var(--color-text-muted)">
+        Grupos B, C e D são calculados automaticamente com desfasamento de 2 dias.<br>
+        Excepções registadas serão aplicadas após a geração.
+      </p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="fecharGerar()">Cancelar</button>
+      <button class="btn btn-accent" onclick="executarGerar()">⚡ Gerar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: excepção -->
+<div class="modal-overlay" id="modal-exc" style="display:none" onclick="if(event.target===this)fecharExc()">
   <div class="modal">
     <div class="modal-header">
       <div class="modal-title">Adicionar Excepção</div>
-      <button class="modal-close" onclick="fecharModalExcecao()">✕</button>
+      <button class="modal-close" onclick="fecharExc()">✕</button>
     </div>
     <div class="modal-body">
       <div class="form-group">
         <label class="form-label">Colaborador</label>
-        <select class="form-control" id="ex-colaborador">
-          <option value="">— Seleccionar —</option>
-        </select>
+        <select class="form-control" id="exc-colab"><option value="">— Seleccionar —</option></select>
       </div>
       <div class="form-group">
         <label class="form-label">Tipo</label>
-        <select class="form-control" id="ex-tipo">
+        <select class="form-control" id="exc-tipo">
           <option value="ferias">Férias</option>
           <option value="licenca_doenca">Licença de Doença</option>
+          <option value="licenca_disciplinar">Licença Disciplinar</option>
           <option value="licenca_especial">Licença Especial</option>
           <option value="acidente">Acidente</option>
           <option value="outro">Outro</option>
         </select>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
         <div class="form-group">
           <label class="form-label">Dia Início</label>
-          <input type="number" class="form-control" id="ex-dia-inicio" min="1" max="31" value="1">
+          <input type="number" class="form-control" id="exc-ini" min="1" max="31" value="1">
         </div>
         <div class="form-group">
           <label class="form-label">Dia Fim</label>
-          <input type="number" class="form-control" id="ex-dia-fim" min="1" max="31" value="31">
+          <input type="number" class="form-control" id="exc-fim" min="1" max="31" value="30">
         </div>
       </div>
       <div class="form-group">
         <label class="form-label">Substituto (opcional)</label>
-        <select class="form-control" id="ex-substituto">
-          <option value="">— Sem substituto —</option>
-        </select>
+        <select class="form-control" id="exc-sub"><option value="">— Sem substituto —</option></select>
       </div>
       <div class="form-group">
         <label class="form-label">Observação</label>
-        <input type="text" class="form-control" id="ex-obs" placeholder="Opcional">
+        <input type="text" class="form-control" id="exc-obs" placeholder="Opcional">
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="fecharModalExcecao()">Cancelar</button>
-      <button class="btn btn-primary" onclick="guardarExcecao()">Guardar</button>
-    </div>
-  </div>
-</div>
-
-<!-- ── Modal: Confirmar gerar ────────────────────────────── -->
-<div class="modal-overlay" id="modal-gerar" style="display:none" onclick="fecharModalGerar(event)">
-  <div class="modal" style="max-width:420px;">
-    <div class="modal-header">
-      <div class="modal-title">⚡ Gerar Escala</div>
-      <button class="modal-close" onclick="fecharModalGerar()">✕</button>
-    </div>
-    <div class="modal-body">
-      <p style="font-size:14px;margin-bottom:16px;" id="modal-gerar-texto"></p>
-      <div class="form-group">
-        <label class="form-label">Posição inicial — Grupo A (dia 1)</label>
-        <select class="form-control" id="gerar-pos-a">
-          <option value="0">07/19 (1º manhã)</option>
-          <option value="1">07/19 (2º manhã)</option>
-          <option value="2">19/07 (1º noite)</option>
-          <option value="3">19/07 (2º noite)</option>
-          <option value="4">Folga (1º)</option>
-          <option value="5">Folga (2º)</option>
-          <option value="6">Folga (3º)</option>
-          <option value="7">Folga (4º)</option>
-        </select>
-      </div>
-      <p style="font-size:12px;color:var(--color-text-muted);">
-        Os grupos B, C e D são calculados automaticamente com desfasamento de 2 dias.<br>
-        As excepções definidas serão aplicadas após a geração.
-      </p>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="fecharModalGerar()">Cancelar</button>
-      <button class="btn btn-accent" onclick="gerarEscala()">⚡ Gerar</button>
+      <button class="btn btn-ghost" onclick="fecharExc()">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardarExc()">Guardar</button>
     </div>
   </div>
 </div>
 
 <script>
-// ── Estado global ───────────────────────────────────────
 const user = requireAuth();
 const { tema } = carregarTema();
-
 document.getElementById('user-nome').textContent  = user.nome;
 document.getElementById('user-nivel').textContent = user.nivel;
 document.getElementById('user-avatar').textContent = user.nome.charAt(0).toUpperCase();
-document.querySelectorAll('.tema-dot').forEach(d => {
-  if (d.dataset.tema === tema) d.classList.add('active');
-});
+document.querySelectorAll('.tema-dot').forEach(d => { if(d.dataset.tema===tema) d.classList.add('active'); });
+function mudarTema(t){ const e=localStorage.getItem('dm_escuro')==='true'; guardarTema(t,e); document.querySelectorAll('.tema-dot').forEach(d=>d.classList.toggle('active',d.dataset.tema===t)); }
+function toggleEscuro(){ const e=localStorage.getItem('dm_escuro')!=='true'; guardarTema(localStorage.getItem('dm_tema')||'azul',e); }
 
-function mudarTema(t) {
-  const e = localStorage.getItem('dm_escuro') === 'true';
-  guardarTema(t, e);
-  document.querySelectorAll('.tema-dot').forEach(d => d.classList.toggle('active', d.dataset.tema === t));
-}
-function toggleEscuro() {
-  const e = localStorage.getItem('dm_escuro') !== 'true';
-  guardarTema(localStorage.getItem('dm_tema') || 'azul', e);
-}
-
-// Mês/Ano actuais
-const hoje = new Date();
-let mesActual  = hoje.getMonth() + 1;
-let anoActual  = hoje.getFullYear();
+// ── Estado global ────────────────────────────────────────
+const hoje     = new Date();
+let mesA       = hoje.getMonth()+1;
+let anoA       = hoje.getFullYear();
 let escalaId   = null;
-let escalaEstado = null;
-let colaboradores = [];
-let grupos = [];
-let feriados = [];
-let dadosDias = {}; // { colaborador_id: { dia: turno } }
+let escalaEst  = null;
+let colabs     = [];
+let grupos     = [];
+let feriados   = [];
+let dadosDias  = {};
+let celActual  = null;
 
-// Inicializar selects
-document.getElementById('sel-mes').value = mesActual;
-document.getElementById('sel-ano').value = anoActual;
+document.getElementById('sel-mes').value = mesA;
+document.getElementById('sel-ano').value = anoA;
 
-// ── Tabs ────────────────────────────────────────────────
-function mudarTab(tab) {
-  document.querySelectorAll('.tab-btn').forEach((b,i) => {
-    b.classList.toggle('active', ['grade','excecoes','folgas'][i] === tab);
-  });
-  document.querySelectorAll('.tab-panel').forEach((p,i) => {
-    p.classList.toggle('active', ['tab-grade','tab-excecoes','tab-folgas'][i] === 'tab-'+tab);
-  });
-  if (tab === 'excecoes') carregarExcecoes();
-  if (tab === 'folgas')   carregarFolgas();
+// ── Tabs ─────────────────────────────────────────────────
+function mudarTab(tab){
+  const nomes=['grade','excecoes','folgas'];
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',nomes[i]===tab));
+  document.querySelectorAll('.tab-panel').forEach((p,i)=>p.classList.toggle('active',['tab-grade','tab-excecoes','tab-folgas'][i]==='tab-'+tab));
+  if(tab==='excecoes') carregarExcs();
+  if(tab==='folgas')   carregarFolgas();
 }
 
-// ── Mudar mês ───────────────────────────────────────────
-function mudarMes() {
-  mesActual = parseInt(document.getElementById('sel-mes').value);
-  anoActual = parseInt(document.getElementById('sel-ano').value);
-  escalaId  = null;
-  dadosDias = {};
+// ── Mudar mês ─────────────────────────────────────────────
+function mudarMes(){
+  mesA=parseInt(document.getElementById('sel-mes').value);
+  anoA=parseInt(document.getElementById('sel-ano').value);
+  escalaId=null; dadosDias={};
   carregarEscala();
 }
 
-// ── Carregar escala ─────────────────────────────────────
-async function carregarEscala() {
-  document.getElementById('grade-container').innerHTML = '<div class="loading">A carregar...</div>';
-  document.getElementById('titulo-pagina').textContent =
-    `Escala Mensal — ${MESES[mesActual-1]} ${anoActual}`;
+// ── Carregar escala ───────────────────────────────────────
+async function carregarEscala(){
+  document.getElementById('grade-container').innerHTML='<div class="loading">A carregar...</div>';
+  document.getElementById('titulo-pagina').textContent=`Escala Mensal — ${MESES[mesA-1]} ${anoA}`;
 
-  // Carregar grupos e colaboradores
-  [grupos, colaboradores, feriados] = await Promise.all([
-    db.query('escala_grupos', 'tipo=eq.turno&order=ordem.asc&select=*'),
-    db.query('collaborators', 'active=eq.true&order=name.asc&select=id,name,categoria,funcao_grupo,grupo_id,faz_turno'),
-    db.query('escala_feriados', `ano=eq.${anoActual}&select=data`)
+  [grupos, colabs] = await Promise.all([
+    db.query('escala_grupos','order=ordem.asc&select=*'),
+    db.query('collaborators','active=eq.true&order=name.asc&select=id,name,categoria,funcao_grupo,grupo_id,faz_turno')
   ]);
 
-  feriados = (feriados || []).map(f => new Date(f.data).getDate() +
-    '_' + (new Date(f.data).getMonth()+1));
+  const ferRes = await db.query('escala_feriados',`ano=eq.${anoA}&select=data`);
+  feriados = (ferRes||[]).map(f=>{
+    const d=new Date(f.data+'T00:00:00');
+    return d.getDate()+'_'+(d.getMonth()+1);
+  });
 
-  // Ver se já existe escala para este mês
-  const escalas = await db.query('escala_mensal', `ano=eq.${anoActual}&mes=eq.${mesActual}&select=*`);
-
-  if (escalas && escalas.length > 0) {
-    escalaId    = escalas[0].id;
-    escalaEstado = escalas[0].estado;
-    actualizarBadgeEstado();
+  const esc = await db.query('escala_mensal',`ano=eq.${anoA}&mes=eq.${mesA}&select=*`);
+  if(esc && esc.length>0){
+    escalaId=esc[0].id; escalaEst=esc[0].estado;
+    actualizarBadge();
     await carregarDias();
     renderGrade();
   } else {
-    escalaId = null;
-    escalaEstado = null;
-    document.getElementById('badge-estado').style.display = 'none';
-    document.getElementById('btn-publicar').style.display = 'none';
-    document.getElementById('grade-container').innerHTML = `
+    escalaId=null; escalaEst=null;
+    document.getElementById('badge-estado').style.display='none';
+    document.getElementById('btn-publicar').style.display='none';
+    document.getElementById('grade-container').innerHTML=`
       <div class="empty-state">
         <div class="icon">📅</div>
-        <p>Escala de <strong>${MESES[mesActual-1]} ${anoActual}</strong> ainda não foi gerada.</p>
-        <p style="margin-top:8px;font-size:13px;">Clica em <strong>⚡ Gerar Escala</strong> para começar.</p>
+        <p>Escala de <strong>${MESES[mesA-1]} ${anoA}</strong> ainda não gerada.</p>
+        <p style="margin-top:8px;font-size:13px">Clica em <strong>⚡ Gerar Escala</strong> para começar.</p>
       </div>`;
   }
 }
 
-// ── Carregar dias da escala ─────────────────────────────
-async function carregarDias() {
-  if (!escalaId) return;
-  const dias = await db.query('escala_mensal_dias',
-    `escala_id=eq.${escalaId}&select=colaborador_id,dia,turno`
-  );
-  dadosDias = {};
-  (dias || []).forEach(d => {
-    if (!dadosDias[d.colaborador_id]) dadosDias[d.colaborador_id] = {};
-    dadosDias[d.colaborador_id][d.dia] = d.turno;
+async function carregarDias(){
+  if(!escalaId) return;
+  const dias=await db.query('escala_mensal_dias',`escala_id=eq.${escalaId}&select=colaborador_id,dia,turno`);
+  dadosDias={};
+  (dias||[]).forEach(d=>{
+    if(!dadosDias[d.colaborador_id]) dadosDias[d.colaborador_id]={};
+    dadosDias[d.colaborador_id][d.dia]=d.turno;
   });
 }
 
-// ── Render grade ────────────────────────────────────────
-function renderGrade() {
-  const totalDias = diasNoMes(anoActual, mesActual);
-  const diaHojeN  = (mesActual === hoje.getMonth()+1 && anoActual === hoje.getFullYear())
-                    ? hoje.getDate() : -1;
+// ── Render grade ──────────────────────────────────────────
+function renderGrade(){
+  const totalDias=diasNoMes(anoA,mesA);
+  const diaH=(mesA===hoje.getMonth()+1 && anoA===hoje.getFullYear()) ? hoje.getDate() : -1;
 
-  // Cabeçalho dos dias
-  let thDias = '';
-  for (let d = 1; d <= totalDias; d++) {
-    const diaSem = new Date(anoActual, mesActual-1, d).getDay();
-    const isFds  = diaSem === 0 || diaSem === 6;
-    const isFer  = feriados.includes(d + '_' + mesActual);
-    const isHoje = d === diaHojeN;
-    const cls    = isHoje ? 'th-hoje' : isFer ? 'th-fer' : isFds ? 'th-fds' : '';
-    const diaSemLabel = ['D','S','T','Q','Q','S','S'][diaSem];
-    thDias += `<th class="th-dia ${cls}" title="${DIAS_SEMANA[diaSem]}">${d}<br><small>${diaSemLabel}</small></th>`;
+  // Cabeçalho dias
+  let thDias='';
+  for(let d=1;d<=totalDias;d++){
+    const ds=new Date(anoA,mesA-1,d).getDay();
+    const isFds=ds===0||ds===6;
+    const isFer=feriados.includes(d+'_'+mesA);
+    const isH=d===diaH;
+    const cls=isH?'th-hoje-h':isFer?'th-fer':isFds?'th-fds':'';
+    const sl=['D','S','T','Q','Q','S','S'][ds];
+    thDias+=`<th class="th-dia ${cls}">${d}<br><small>${sl}</small></th>`;
   }
 
-  // Colunas de folgas
-  const thFolgas = `<th title="Folgas Anterior">Ant</th>
-                    <th title="Folgas Feitas">Feit</th>
-                    <th title="Folgas Gozadas">Goz</th>
-                    <th title="Folgas Existente">Exi</th>`;
-
-  let html = `<div class="grade-wrap"><table class="grade-table">
+  let html=`<div class="grade-wrap"><table class="grade-table">
     <thead><tr>
-      <th class="th-nome">Colaborador</th>
-      ${thDias}
-      ${thFolgas}
+      <th class="th-nome">Colaborador</th>${thDias}
+      <th title="Anterior">Ant</th><th title="Feitas">Fei</th><th title="Gozadas">Goz</th><th title="Existente">Exi</th>
     </tr></thead><tbody>`;
 
-  // Agrupar colaboradores por grupo
-  const gruposOrdem = [...(grupos||[])];
+  // Definir secções a mostrar
+  const seccoes = [
+    { label:'Grupo A — Turno', filtro: c=>c.faz_turno && grupoCode(c)==='A' },
+    { label:'Grupo B — Turno', filtro: c=>c.faz_turno && grupoCode(c)==='B' },
+    { label:'Grupo C — Turno', filtro: c=>c.faz_turno && grupoCode(c)==='C' },
+    { label:'Grupo D — Turno', filtro: c=>c.faz_turno && grupoCode(c)==='D' },
+    { label:'Pneumáticos',     filtro: c=>grupoCode(c)==='PNE' },
+    { label:'Supervisão',      filtro: c=>c.funcao_grupo==='supervisor' },
+    { label:'Mecânica — Normal', filtro: c=>!c.faz_turno && c.funcao_grupo==='mecanico' && grupoCode(c)==='NORM' },
+    { label:'Eléctrica — Normal',filtro: c=>!c.faz_turno && c.funcao_grupo==='electrico' && grupoCode(c)==='NORM' },
+    { label:'Serralharia',     filtro: c=>c.funcao_grupo==='serralheiro' },
+    { label:'Lubrificação',    filtro: c=>c.funcao_grupo==='lubrificador' },
+    { label:'Motoristas',      filtro: c=>c.funcao_grupo==='motorista' },
+    { label:'Ferramentaria',   filtro: c=>c.funcao_grupo==='ferramenteiro' },
+    { label:'Administração',   filtro: c=>c.funcao_grupo==='administracao' },
+    { label:'Estagiários',     filtro: c=>c.funcao_grupo==='estagiario' },
+    { label:'Outros',          filtro: c=>c.funcao_grupo==='outro'||c.funcao_grupo==='auxiliar' },
+  ];
 
-  // Primeiro os grupos de turno
-  for (const g of gruposOrdem) {
-    const membros = (colaboradores||[]).filter(c => c.grupo_id === g.id && c.faz_turno);
-    if (membros.length === 0) continue;
+  for(const sec of seccoes){
+    const membros=(colabs||[]).filter(sec.filtro);
+    if(membros.length===0) continue;
 
-    html += `<tr class="tr-grupo-header">
-      <td colspan="${totalDias + 5}">Grupo ${g.codigo} — ${g.nome}</td>
-    </tr>`;
+    html+=`<tr class="tr-seccao"><td colspan="${totalDias+5}">${sec.label}</td></tr>`;
 
-    for (const c of membros) {
-      html += renderLinha(c, totalDias, diaHojeN, g);
-    }
+    for(const c of membros) html+=renderLinha(c,totalDias,diaH);
+
+    // Linha de contagem desta secção
+    html+=renderContagem(membros, totalDias, diaH, sec.label);
   }
 
-  // Depois Pneumáticos
-  const gruposPne = await_grupos('PNE');
-  if (gruposPne) {
-    const pnes = (colaboradores||[]).filter(c => c.grupo_id === gruposPne.id);
-    if (pnes.length > 0) {
-      html += `<tr class="tr-grupo-header">
-        <td colspan="${totalDias + 5}">Pneumáticos</td>
-      </tr>`;
-      for (const c of pnes) html += renderLinha(c, totalDias, diaHojeN, gruposPne);
-    }
-  }
-
-  html += '</tbody></table></div>';
-  document.getElementById('grade-container').innerHTML = html;
-  document.getElementById('btn-publicar').style.display =
-    escalaEstado === 'rascunho' ? 'inline-flex' : 'none';
+  html+='</tbody></table></div>';
+  document.getElementById('grade-container').innerHTML=html;
+  document.getElementById('btn-publicar').style.display=escalaEst==='rascunho'?'inline-flex':'none';
 }
 
-function await_grupos(codigo) {
-  // helper síncrono — grupos já carregados
-  const todos = db._cache_grupos || [];
-  // fallback: procurar nos colaboradores
-  return null; // simplificado — pneumáticos aparecem no loop de grupos se adicionarmos tipo fixo
+function grupoCode(c){
+  if(!grupos||!c.grupo_id) return 'NORM';
+  const g=grupos.find(g=>g.id===c.grupo_id);
+  return g ? g.codigo : 'NORM';
 }
 
-function renderLinha(c, totalDias, diaHojeN, grupo) {
-  let html = `<tr>
-    <td class="td-nome">
-      ${abreviarNome(c.name, 24)}<br>
-      <span class="categoria">${c.funcao_grupo || ''}</span>
+function renderLinha(c, totalDias, diaH){
+  const isChefe=c.funcao_grupo==='chefe'||c.categoria?.includes('C.T.')||c.categoria?.includes('C.G.');
+  let html=`<tr>
+    <td class="td-nome ${isChefe?'chefe':''}">
+      ${abreviarNome(c.name,22)}
+      <span class="cat">${c.categoria||''}</span>
     </td>`;
 
-  const turnosColab = dadosDias[c.id] || {};
-
-  for (let d = 1; d <= totalDias; d++) {
-    const turno = turnosColab[d] || '';
-    const cls   = classTurno(turno);
-    const label = labelTurno(turno);
-    const isHoje = d === diaHojeN;
-    html += `<td class="${isHoje ? 'td-hoje' : ''}">
-      <div class="cell-turno ${cls}"
-           onclick="abrirCelula(${c.id}, ${d}, '${turno}', '${c.name.replace(/'/g,"\\'")}')">
-        ${label}
+  const turnos=dadosDias[c.id]||{};
+  for(let d=1;d<=totalDias;d++){
+    const t=turnos[d]||'';
+    const isH=d===diaH;
+    html+=`<td class="${isH?'td-hoje':''}">
+      <div class="ct ${classCT(t)}" onclick="abrirCel(${c.id},${d},'${t}','${c.name.replace(/'/g,"\\'")}')">
+        ${labelCT(t)}
       </div>
     </td>`;
   }
-
-  // Folgas (placeholder — actualizado ao gerar)
-  html += `<td class="td-folgas">—</td>
-           <td class="td-folgas">—</td>
-           <td class="td-folgas">—</td>
-           <td class="td-folgas">—</td>`;
-
-  html += '</tr>';
+  html+=`<td class="td-folga-val">—</td><td class="td-folga-val">—</td><td class="td-folga-val">—</td><td class="td-folga-val">—</td>`;
+  html+='</tr>';
   return html;
 }
 
-function classTurno(t) {
-  const m = { '07/19':'ct-manha','19/07':'ct-noite','Folga':'ct-folga',
-              'Ferias':'ct-ferias','LD':'ct-ld','Norm.':'ct-norm',
-              'FRD':'ct-frd','Sup.':'ct-sup' };
-  return m[t] || 'ct-vazio';
-}
-function labelTurno(t) {
-  const m = { '07/19':'M','19/07':'N','Folga':'F','Ferias':'Fér',
-              'LD':'LD','Norm.':'Nr','FRD':'Fr','Sup.':'Sp' };
-  return m[t] || '';
-}
-
-// ── Badge estado ────────────────────────────────────────
-function actualizarBadgeEstado() {
-  const badge = document.getElementById('badge-estado');
-  const labels = { rascunho:'Rascunho', publicada:'Publicada', encerrada:'Encerrada' };
-  badge.textContent = labels[escalaEstado] || escalaEstado;
-  badge.className   = `estado-badge estado-${escalaEstado}`;
-  badge.style.display = 'inline-block';
+function renderContagem(membros, totalDias, diaH, label){
+  let html=`<tr class="tr-count">
+    <td class="td-count-nome">Total ${label.split('—')[0].trim()}</td>`;
+  for(let d=1;d<=totalDias;d++){
+    const isH=d===diaH;
+    // Contar quem está presente (não Folga, não Férias, não LD, não LDi)
+    const ausentes=['Folga','Ferias','LD','LDi'];
+    const presentes=membros.filter(c=>{
+      const t=(dadosDias[c.id]||{})[d]||'';
+      return t===''||!ausentes.includes(t);
+    }).length;
+    html+=`<td class="${isH?'td-hoje':''}" style="color:${presentes>0?'#9ae6b4':'#fc8181'}">${presentes||''}</td>`;
+  }
+  html+=`<td colspan="4"></td></tr>`;
+  return html;
 }
 
-// ── Confirmar gerar ─────────────────────────────────────
-function confirmarGerar() {
-  const texto = escalaId
-    ? `Já existe uma escala para <strong>${MESES[mesActual-1]} ${anoActual}</strong>. Ao gerar novamente, os dados actuais serão substituídos. Continuar?`
-    : `Gerar escala de <strong>${MESES[mesActual-1]} ${anoActual}</strong>?`;
-  document.getElementById('modal-gerar-texto').innerHTML = texto;
-  document.getElementById('modal-gerar').style.display = 'flex';
+function classCT(t){
+  const m={'07/19':'ct-M','19/07':'ct-N','Folga':'ct-F','Ferias':'ct-Fe',
+           'LD':'ct-LD','LDi':'ct-LDi','Norm.':'ct-Nr','FRD':'ct-FR',
+           'Sup.':'ct-Sp','Esc.':'ct-Ec','CCIS':'ct-CC'};
+  return m[t]||'ct-vz';
 }
-function fecharModalGerar(e) {
-  if (e && e.target !== document.getElementById('modal-gerar')) return;
-  document.getElementById('modal-gerar').style.display = 'none';
+function labelCT(t){
+  const m={'07/19':'M','19/07':'N','Folga':'F','Ferias':'Fér',
+           'LD':'LD','LDi':'LDi','Norm.':'Nr','FRD':'FR',
+           'Sup.':'Sp','Esc.':'Ec','CCIS':'CC'};
+  return m[t]||'';
 }
 
-// ── Gerar escala ────────────────────────────────────────
-async function gerarEscala() {
-  document.getElementById('modal-gerar').style.display = 'none';
-  const posA = parseInt(document.getElementById('gerar-pos-a').value);
+// ── Badge estado ──────────────────────────────────────────
+function actualizarBadge(){
+  const b=document.getElementById('badge-estado');
+  const l={rascunho:'Rascunho',publicada:'Publicada',encerrada:'Encerrada'};
+  b.textContent=l[escalaEst]||escalaEst;
+  b.className=`estado-badge estado-${escalaEst}`;
+  b.style.display='inline-block';
+}
 
-  toast('A gerar escala...', 'info');
+// ── Gerar ─────────────────────────────────────────────────
+function confirmarGerar(){
+  document.getElementById('gerar-txt').innerHTML=escalaId
+    ? `Já existe escala para <strong>${MESES[mesA-1]} ${anoA}</strong>. Substituir?`
+    : `Gerar escala de <strong>${MESES[mesA-1]} ${anoA}</strong>?`;
+  document.getElementById('modal-gerar').style.display='flex';
+}
+function fecharGerar(){ document.getElementById('modal-gerar').style.display='none'; }
 
-  const totalDias = diasNoMes(anoActual, mesActual);
+async function executarGerar(){
+  fecharGerar();
+  const posA  = parseInt(document.getElementById('gerar-pos').value);
+  const supIdx= parseInt(document.getElementById('gerar-sup').value);
+  const supIds= (colabs||[]).filter(c=>c.funcao_grupo==='supervisor').map(c=>c.id);
+  toast('A gerar escala...','info');
 
-  // 1. Criar ou actualizar cabeçalho
-  let novoId = escalaId;
-  if (!escalaId) {
-    const res = await db.insert('escala_mensal', {
-      ano: anoActual, mes: mesActual,
-      estado: 'rascunho', gerada_por: user.codigo || 'DM0069'
-    });
-    if (!res || res.error) { toast('Erro ao criar escala!', 'erro'); return; }
-    novoId = res[0].id;
+  const totalDias=diasNoMes(anoA,mesA);
+
+  // Criar/actualizar cabeçalho
+  let novoId=escalaId;
+  if(!escalaId){
+    const res=await db.insert('escala_mensal',{ano:anoA,mes:mesA,estado:'rascunho',gerada_por:user.codigo||'DM0069'});
+    if(!res||res.error){ toast('Erro ao criar escala!','erro'); return; }
+    novoId=Array.isArray(res)?res[0].id:res.id;
   }
 
-  // 2. Apagar dias existentes
-  await fetch(`${SUPABASE_URL}/rest/v1/escala_mensal_dias?escala_id=eq.${novoId}`, {
-    method: 'DELETE', headers: headers()
-  });
+  // Apagar dias existentes
+  await fetch(`${SUPABASE_URL}/rest/v1/escala_mensal_dias?escala_id=eq.${novoId}`,{method:'DELETE',headers:headers()});
 
-  // 3. Gerar dias para cada colaborador de turno
-  const colabTurno = (colaboradores||[]).filter(c => c.faz_turno);
-  const batch = [];
+  // Excepções
+  const excs=await db.query('escala_excecoes',`escala_id=eq.${novoId}&select=*`)||[];
+  const batch=[];
 
-  // Carregar excepções do mês
-  const excecoes = await db.query('escala_excecoes',
-    `escala_id=eq.${novoId}&select=*`
-  ) || [];
+  for(const c of (colabs||[])){
+    const gc=grupoCode(c);
+    const g=grupos.find(g=>g.id===c.grupo_id);
+    const excColab=excs.filter(e=>e.colaborador_id===c.id);
+    const isSup=c.funcao_grupo==='supervisor';
 
-  for (const c of colabTurno) {
-    const g = (grupos||[]).find(g => g.id === c.grupo_id);
-    if (!g) continue;
+    for(let d=1;d<=totalDias;d++){
+      const diaSem=new Date(anoA,mesA-1,d).getDay(); // 0=Dom,6=Sáb
+      const isFds=diaSem===0||diaSem===6;
+      const isFer=feriados.includes(d+'_'+mesA);
+      const isUteI=!isFds&&!isFer; // dia útil
 
-    const offsetGrupo = ((g.offset_inicio || 0) - posA + 8) % 8;
+      // Excepção?
+      const exc=excColab.find(e=>d>=e.dia_inicio&&d<=e.dia_fim);
+      let turno='';
 
-    // Ver excepções deste colaborador
-    const excColab = excecoes.filter(e => e.colaborador_id === c.id);
-
-    for (let d = 1; d <= totalDias; d++) {
-      // Verificar se está em excepção
-      const exc = excColab.find(e => d >= e.dia_inicio && d <= e.dia_fim);
-      let turno;
-
-      if (exc) {
-        const tipoTurno = {
-          ferias: 'Ferias', licenca_doenca: 'LD',
-          licenca_especial: 'LD', acidente: 'LD', outro: 'Norm.'
-        };
-        turno = tipoTurno[exc.tipo] || 'Norm.';
-      } else {
-        // Verificar feriado
-        const isFer = feriados.includes(d + '_' + mesActual);
-        if (isFer) {
-          turno = 'FRD';
-        } else if (g.tipo === 'fixo') {
-          // Pneumáticos — sempre noite
-          turno = '19/07';
+      if(exc){
+        const tm={ferias:'Ferias',licenca_doenca:'LD',licenca_disciplinar:'LDi',licenca_especial:'LD',acidente:'LD',outro:'Norm.'};
+        turno=tm[exc.tipo]||'Norm.';
+      } else if(['A','B','C','D'].includes(gc) && c.faz_turno){
+        // Grupos de turno — ciclo 2+2+4
+        // CORRECÇÃO: offset do grupo relativo ao posA
+        const gOffset=g?.offset_inicio||0;
+        // Posição no ciclo para o dia d, com posA como ponto de partida do Grupo A no dia 1
+        const pos=(posA+gOffset+d-1)%8;
+        if(pos===0||pos===1) turno='07/19';
+        else if(pos===2||pos===3) turno='19/07';
+        else turno='Folga';
+      } else if(gc==='PNE' && c.faz_turno){
+        // Pneumáticos de turno — 19/07 nos primeiros 2 dias, resto Norm.
+        if(d<=2) turno='19/07';
+        else if(d<=4) turno='Folga';
+        else turno=isFds?'Esc.':'Norm.';
+      } else if(isSup){
+        // Supervisores: Sáb+Dom=Sup., Seg+Qui+Sex=Norm., Ter+Qua=Folga
+        // Rotação semanal: supIdx determina quem começa
+        // Calcular semana do mês (0-based, semana começa Sáb)
+        const diaRef=new Date(anoA,mesA-1,d);
+        // Semana desde o início do mês (sáb=inicio)
+        const primSab=new Date(anoA,mesA-1,1);
+        const dsDiff=primSab.getDay(); // dia semana do dia 1
+        // Número da semana (0-based) deste dia no mês
+        const semNr=Math.floor((d-1+((dsDiff+1)%7))/7);
+        // Qual supervisor está escalado nesta semana?
+        const supEscalado=supIds[(supIdx+semNr)%Math.max(supIds.length,1)];
+        if(c.id===supEscalado){
+          if(diaSem===6||diaSem===0) turno='Sup.';
+          else if(diaSem===2||diaSem===3) turno='Folga'; // Ter=2, Qua=3
+          else turno='Norm.';
+          // Feriado: sempre Sup./trabalha
+          if(isFer && turno==='Folga') turno='Sup.';
         } else {
-          // Calcular pelo ciclo 2+2+4
-          const pos = (offsetGrupo + d - 1) % 8;
-          if (pos === 0 || pos === 1) turno = '07/19';
-          else if (pos === 2 || pos === 3) turno = '19/07';
-          else turno = 'Folga';
+          turno=isFds?'Folga':isFer?'FRD':'Norm.';
         }
+      } else {
+        // Todo o resto (normal, serralheiros, motoristas, etc.)
+        if(isFer) turno='FRD';
+        else if(isFds) turno='Folga';
+        else turno='Norm.';
       }
 
-      batch.push({
-        escala_id: novoId,
-        colaborador_id: c.id,
-        dia: d,
-        turno
-      });
+      batch.push({escala_id:novoId,colaborador_id:c.id,dia:d,turno});
     }
   }
 
-  // 4. Inserir em lotes de 500
-  for (let i = 0; i < batch.length; i += 500) {
-    const lote = batch.slice(i, i + 500);
-    await db.insert('escala_mensal_dias', lote);
+  // Inserir em lotes de 500
+  for(let i=0;i<batch.length;i+=500){
+    await db.insert('escala_mensal_dias',batch.slice(i,i+500));
   }
 
-  // 5. Guardar estado do padrão
-  await fetch(`${SUPABASE_URL}/rest/v1/escala_padrao_estado?grupo_id=in.(${(grupos||[]).map(g=>g.id).join(',')})&ano=eq.${anoActual}&mes=eq.${mesActual}`, {
-    method: 'DELETE', headers: headers()
-  });
-  for (const g of (grupos||[])) {
-    const offsetGrupo = ((g.offset_inicio || 0) - posA + 8) % 8;
-    await db.insert('escala_padrao_estado', {
-      grupo_id: g.id, ano: anoActual, mes: mesActual,
-      ultimo_turno: '07/19', dias_feitos: offsetGrupo
-    });
-  }
-
-  escalaId    = novoId;
-  escalaEstado = 'rascunho';
-  actualizarBadgeEstado();
+  escalaId=novoId; escalaEst='rascunho';
+  actualizarBadge();
   await carregarDias();
   renderGrade();
-  toast(`Escala de ${MESES[mesActual-1]} ${anoActual} gerada!`, 'ok');
-  document.getElementById('info-guardado').textContent =
-    'Gerada às ' + new Date().toLocaleTimeString('pt-PT', {hour:'2-digit',minute:'2-digit'});
+  toast(`Escala de ${MESES[mesA-1]} ${anoA} gerada!`,'ok');
+  document.getElementById('info-guardado').textContent='Gerada às '+new Date().toLocaleTimeString('pt-PT',{hour:'2-digit',minute:'2-digit'});
 }
 
-// ── Publicar ────────────────────────────────────────────
-async function publicarEscala() {
-  if (!confirmar(`Publicar a escala de ${MESES[mesActual-1]} ${anoActual}?`)) return;
-  await db.update('escala_mensal', escalaId, { estado: 'publicada' });
-  escalaEstado = 'publicada';
-  actualizarBadgeEstado();
-  document.getElementById('btn-publicar').style.display = 'none';
-  toast('Escala publicada!', 'ok');
+// ── Publicar ──────────────────────────────────────────────
+async function publicarEscala(){
+  if(!confirmar(`Publicar a escala de ${MESES[mesA-1]} ${anoA}?`)) return;
+  await db.update('escala_mensal',escalaId,{estado:'publicada'});
+  escalaEst='publicada'; actualizarBadge();
+  document.getElementById('btn-publicar').style.display='none';
+  toast('Escala publicada!','ok');
 }
 
-// ── Modal célula ────────────────────────────────────────
-let celulaActual = null;
-
-function abrirCelula(colaboradorId, dia, turnoActual, nome) {
-  if (!escalaId) { toast('Gera a escala primeiro.', 'aviso'); return; }
-  celulaActual = { colaboradorId, dia };
-  document.getElementById('modal-celula-titulo').textContent = abreviarNome(nome);
-  document.getElementById('modal-celula-info').textContent =
-    `Dia ${dia} de ${MESES[mesActual-1]} — Turno actual: ${turnoActual || '—'}`;
-  document.querySelectorAll('.turno-opt').forEach(o => o.classList.remove('selected'));
-  document.getElementById('modal-celula').style.display = 'flex';
+// ── Modal célula ──────────────────────────────────────────
+function abrirCel(cId,dia,turnoActual,nome){
+  if(!escalaId){ toast('Gera a escala primeiro.','aviso'); return; }
+  celActual={cId,dia};
+  document.getElementById('cel-titulo').textContent=abreviarNome(nome,28);
+  document.getElementById('cel-info').textContent=`Dia ${dia} de ${MESES[mesA-1]} — Actual: ${turnoActual||'—'}`;
+  document.getElementById('modal-cel').style.display='flex';
 }
+function fecharCel(){ document.getElementById('modal-cel').style.display='none'; celActual=null; }
 
-function fecharModalCelula(e) {
-  if (e && e.target !== document.getElementById('modal-celula')) return;
-  document.getElementById('modal-celula').style.display = 'none';
-  celulaActual = null;
-}
-
-async function selecionarTurno(turno) {
-  if (!celulaActual || !escalaId) return;
-  document.getElementById('modal-celula').style.display = 'none';
-
-  const { colaboradorId, dia } = celulaActual;
-
-  // Actualizar na BD — upsert via PATCH/POST
-  const existente = await db.query('escala_mensal_dias',
-    `escala_id=eq.${escalaId}&colaborador_id=eq.${colaboradorId}&dia=eq.${dia}&select=id`
-  );
-
-  if (existente && existente.length > 0) {
-    await fetch(`${SUPABASE_URL}/rest/v1/escala_mensal_dias?id=eq.${existente[0].id}`, {
-      method: 'PATCH',
-      headers: { ...headers(), 'Prefer': 'return=representation' },
-      body: JSON.stringify({ turno, editado_manualmente: true })
-    });
+async function gravarTurno(turno){
+  if(!celActual||!escalaId) return;
+  fecharCel();
+  const {cId,dia}=celActual;
+  const ex=await db.query('escala_mensal_dias',`escala_id=eq.${escalaId}&colaborador_id=eq.${cId}&dia=eq.${dia}&select=id`);
+  if(ex&&ex.length>0){
+    await fetch(`${SUPABASE_URL}/rest/v1/escala_mensal_dias?id=eq.${ex[0].id}`,{method:'PATCH',headers:{...headers(),'Prefer':'return=representation'},body:JSON.stringify({turno,editado_manualmente:true})});
   } else {
-    await db.insert('escala_mensal_dias', {
-      escala_id: escalaId, colaborador_id: colaboradorId,
-      dia, turno, editado_manualmente: true
-    });
+    await db.insert('escala_mensal_dias',{escala_id:escalaId,colaborador_id:cId,dia,turno,editado_manualmente:true});
   }
-
-  // Actualizar cache local e re-render
-  if (!dadosDias[colaboradorId]) dadosDias[colaboradorId] = {};
-  dadosDias[colaboradorId][dia] = turno;
+  if(!dadosDias[cId]) dadosDias[cId]={};
+  dadosDias[cId][dia]=turno;
   renderGrade();
-  toast('Turno actualizado!', 'ok');
+  toast('Turno actualizado!','ok');
 }
 
-// ── Excepções ────────────────────────────────────────────
-async function carregarExcecoes() {
-  if (!escalaId) {
-    document.getElementById('excecoes-lista').innerHTML =
-      '<div style="color:var(--color-text-muted);font-size:13px;">Gera a escala primeiro para adicionar excepções.</div>';
+// ── Excepções ─────────────────────────────────────────────
+async function carregarExcs(){
+  if(!escalaId){
+    document.getElementById('excecoes-lista').innerHTML='<div style="color:var(--color-text-muted);font-size:13px">Gera a escala primeiro.</div>';
     return;
   }
-  const excs = await db.query('escala_excecoes',
-    `escala_id=eq.${escalaId}&select=*`
-  ) || [];
-  const lista = document.getElementById('excecoes-lista');
-  if (excs.length === 0) {
-    lista.innerHTML = '<div style="color:var(--color-text-muted);font-size:13px;">Sem excepções registadas.</div>';
-    return;
-  }
-  const tipos = { ferias:'Férias', licenca_doenca:'Lic. Doença',
-                  licenca_especial:'Lic. Especial', acidente:'Acidente', outro:'Outro' };
-  lista.innerHTML = excs.map(e => {
-    const colab = (colaboradores||[]).find(c => c.id === e.colaborador_id);
-    const sub   = e.substituto_id ? (colaboradores||[]).find(c => c.id === e.substituto_id) : null;
-    return `<div class="excecao-item">
+  const excs=await db.query('escala_excecoes',`escala_id=eq.${escalaId}&select=*`)||[];
+  const tipos={ferias:'Férias',licenca_doenca:'Lic. Doença',licenca_disciplinar:'Lic. Disciplinar',licenca_especial:'Lic. Especial',acidente:'Acidente',outro:'Outro'};
+  const lista=document.getElementById('excecoes-lista');
+  if(excs.length===0){ lista.innerHTML='<div style="color:var(--color-text-muted);font-size:13px">Sem excepções registadas.</div>'; return; }
+  lista.innerHTML=excs.map(e=>{
+    const c=(colabs||[]).find(c=>c.id===e.colaborador_id);
+    const s=e.substituto_id?(colabs||[]).find(c=>c.id===e.substituto_id):null;
+    return `<div class="exc-item">
       <div>
-        <div class="ex-nome">${colab ? abreviarNome(colab.name) : '—'}</div>
-        <div class="ex-dias">Dias ${e.dia_inicio} a ${e.dia_fim}${sub ? ` · Sub: ${abreviarNome(sub.name)}` : ''}</div>
+        <div class="exc-nome">${c?abreviarNome(c.name):'—'}</div>
+        <div style="font-size:11px;color:var(--color-text-muted)">Dias ${e.dia_inicio} a ${e.dia_fim}${s?` · Sub: ${abreviarNome(s.name)}`:''}</div>
       </div>
-      <div style="display:flex;align-items:center;gap:8px;">
-        <span class="ex-tipo">${tipos[e.tipo] || e.tipo}</span>
-        <button class="btn btn-danger btn-sm" onclick="apagarExcecao(${e.id})">✕</button>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span class="exc-tipo">${tipos[e.tipo]||e.tipo}</span>
+        <button class="btn btn-danger btn-sm" onclick="apagarExc(${e.id})">✕</button>
       </div>
     </div>`;
   }).join('');
 }
 
-function abrirExcecoes() {
-  mudarTab('excecoes');
-  carregarExcecoes();
+function abrirModalExcecao(){
+  if(!escalaId){ toast('Gera a escala primeiro.','aviso'); return; }
+  const opts=(colabs||[]).map(c=>`<option value="${c.id}">${abreviarNome(c.name)} (${c.funcao_grupo||''})</option>`).join('');
+  document.getElementById('exc-colab').innerHTML='<option value="">— Seleccionar —</option>'+opts;
+  document.getElementById('exc-sub').innerHTML='<option value="">— Sem substituto —</option>'+opts;
+  document.getElementById('modal-exc').style.display='flex';
+}
+function fecharExc(){ document.getElementById('modal-exc').style.display='none'; }
+
+async function guardarExc(){
+  const cId=document.getElementById('exc-colab').value;
+  const tipo=document.getElementById('exc-tipo').value;
+  const ini=parseInt(document.getElementById('exc-ini').value);
+  const fim=parseInt(document.getElementById('exc-fim').value);
+  const sub=document.getElementById('exc-sub').value||null;
+  const obs=document.getElementById('exc-obs').value;
+  if(!cId){ toast('Selecciona um colaborador.','aviso'); return; }
+  if(ini>fim){ toast('Dia início maior que dia fim.','aviso'); return; }
+  await db.insert('escala_excecoes',{escala_id:escalaId,colaborador_id:parseInt(cId),tipo,dia_inicio:ini,dia_fim:fim,substituto_id:sub?parseInt(sub):null,observacao:obs||null});
+  fecharExc(); carregarExcs();
+  toast('Excepção registada! Re-gera para aplicar.','ok');
 }
 
-function abrirModalExcecao() {
-  if (!escalaId) { toast('Gera a escala primeiro.', 'aviso'); return; }
-  // Popular selects
-  const sel  = document.getElementById('ex-colaborador');
-  const sel2 = document.getElementById('ex-substituto');
-  const colabsFiltrados = (colaboradores||[]).filter(c => c.faz_turno);
-  const opts = colabsFiltrados.map(c =>
-    `<option value="${c.id}">${abreviarNome(c.name)} (${c.funcao_grupo||''})</option>`
-  ).join('');
-  sel.innerHTML  = '<option value="">— Seleccionar —</option>' + opts;
-  sel2.innerHTML = '<option value="">— Sem substituto —</option>' + opts;
-  document.getElementById('modal-excecao').style.display = 'flex';
+async function apagarExc(id){
+  if(!confirmar('Apagar esta excepção?')) return;
+  await db.delete('escala_excecoes',id);
+  carregarExcs(); toast('Excepção removida.','ok');
 }
 
-function fecharModalExcecao(e) {
-  if (e && e.target !== document.getElementById('modal-excecao')) return;
-  document.getElementById('modal-excecao').style.display = 'none';
-}
-
-async function guardarExcecao() {
-  const colaboradorId = document.getElementById('ex-colaborador').value;
-  const tipo          = document.getElementById('ex-tipo').value;
-  const diaInicio     = parseInt(document.getElementById('ex-dia-inicio').value);
-  const diaFim        = parseInt(document.getElementById('ex-dia-fim').value);
-  const substitutoId  = document.getElementById('ex-substituto').value || null;
-  const obs           = document.getElementById('ex-obs').value;
-
-  if (!colaboradorId) { toast('Selecciona um colaborador.', 'aviso'); return; }
-  if (diaInicio > diaFim) { toast('Dia início não pode ser maior que dia fim.', 'aviso'); return; }
-
-  await db.insert('escala_excecoes', {
-    escala_id: escalaId, colaborador_id: parseInt(colaboradorId),
-    tipo, dia_inicio: diaInicio, dia_fim: diaFim,
-    substituto_id: substitutoId ? parseInt(substitutoId) : null,
-    observacao: obs || null
-  });
-
-  fecharModalExcecao();
-  carregarExcecoes();
-  toast('Excepção registada! Re-gera a escala para aplicar.', 'ok');
-}
-
-async function apagarExcecao(id) {
-  if (!confirmar('Apagar esta excepção?')) return;
-  await db.delete('escala_excecoes', id);
-  carregarExcecoes();
-  toast('Excepção removida.', 'ok');
-}
-
-// ── Folgas ───────────────────────────────────────────────
-async function carregarFolgas() {
-  if (!escalaId) {
-    document.getElementById('tbody-folgas').innerHTML =
-      '<tr><td colspan="6" style="color:var(--color-text-muted);text-align:center;padding:20px;">Gera a escala primeiro.</td></tr>';
+// ── Folgas ────────────────────────────────────────────────
+async function carregarFolgas(){
+  if(!escalaId){
+    document.getElementById('tbody-folgas').innerHTML='<tr><td colspan="6" style="text-align:center;padding:20px;color:var(--color-text-muted)">Gera a escala primeiro.</td></tr>';
     return;
   }
-  const folgas = await db.query('escala_folgas',
-    `escala_id=eq.${escalaId}&select=*`
-  ) || [];
-
-  const tbody = document.getElementById('tbody-folgas');
-  if (folgas.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="6" style="color:var(--color-text-muted);text-align:center;padding:20px;">Sem registos de folgas.</td></tr>';
-    return;
-  }
-  tbody.innerHTML = folgas.map(f => {
-    const c = (colaboradores||[]).find(c => c.id === f.colaborador_id);
-    const g = c ? (grupos||[]).find(g => g.id === c.grupo_id) : null;
+  const fs=await db.query('escala_folgas',`escala_id=eq.${escalaId}&select=*`)||[];
+  const tbody=document.getElementById('tbody-folgas');
+  if(fs.length===0){ tbody.innerHTML='<tr><td colspan="6" style="text-align:center;padding:20px;color:var(--color-text-muted)">Sem registos.</td></tr>'; return; }
+  tbody.innerHTML=fs.map(f=>{
+    const c=(colabs||[]).find(c=>c.id===f.colaborador_id);
+    const g=c?(grupos||[]).find(g=>g.id===c.grupo_id):null;
     return `<tr>
-      <td>${c ? abreviarNome(c.name) : '—'}</td>
-      <td><span class="badge-turno" style="background:var(--color-bg)">${g ? g.codigo : '—'}</span></td>
+      <td>${c?abreviarNome(c.name):'—'}</td>
+      <td style="text-align:center">${g?g.codigo:'—'}</td>
       <td style="text-align:center">${f.folgas_anterior}</td>
       <td style="text-align:center">${f.folgas_feitas}</td>
       <td style="text-align:center">${f.folgas_gozadas}</td>
@@ -1058,7 +791,7 @@ async function carregarFolgas() {
   }).join('');
 }
 
-// ── Arrancar ────────────────────────────────────────────
+// ── Arrancar ──────────────────────────────────────────────
 carregarEscala();
 </script>
 </body>
